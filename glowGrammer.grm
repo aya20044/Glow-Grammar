@@ -1,0 +1,76 @@
+"Name"     = 'Glow Language'
+"Author"   = 'Aya Borham'
+"Version"  = '3.0'
+"About"    = 'Human-friendly custom language using @ for blocks'
+
+"Start Symbol" = <Main>
+
+! -----------------------------
+! Character Sets
+! -----------------------------
+
+{ID Head}      = {Letter} + [_]
+{ID Tail}      = {Alphanumeric} + [_]
+{String Chars} = {Printable} + {HT} - ["\]
+
+! -----------------------------
+! Terminals
+! -----------------------------
+
+Identifier    = {ID Head}{ID Tail}*
+StringLiteral = '"' ( {String Chars} | '\' {Printable} )* '"'
+Number        = {digit}+ ( '.' {digit}+ )?
+
+! -----------------------------
+! Rules
+! -----------------------------
+
+<Main> ::= <StatementList>
+
+<StatementList> ::= 
+               | <StatementList> <Statement>
+               | <Statement>
+
+<Statement> ::= <Declaration> | <Assignment>
+             | <IfStatement> | <RepeatStatement>
+             | <WhileLoop>   | <PrintStatement>
+
+<Declaration> ::= 'let' Identifier '=' <Expression>
+
+<Assignment> ::= 'set' Identifier '=' <Expression>
+
+<PrintStatement> ::= 'print' <Expression>
+
+<IfStatement> ::= 'if' <Expression> '@' <StatementList> '@'
+
+<WhileLoop> ::= 'while' <Expression> '@' <StatementList> '@'
+
+<RepeatStatement> ::= 'repeat' Number 'times' '@' <StatementList> '@'
+
+<Expression> ::= <Expression> 'or' <LogicalTerm>
+              | <LogicalTerm>
+
+<LogicalTerm> ::= <LogicalTerm> 'and' <RelationalExp>
+               | <RelationalExp>
+
+<RelationalExp> ::= <RelationalExp> '==' <AddExp>
+                 | <RelationalExp> '!=' <AddExp>
+                 | <RelationalExp> '<' <AddExp>
+                 | <RelationalExp> '>' <AddExp>
+                 | <RelationalExp> '<=' <AddExp>
+                 | <RelationalExp> '>=' <AddExp>
+                 | <AddExp>
+
+<AddExp> ::= <AddExp> '+' <MultExp>
+          | <AddExp> '-' <MultExp>
+          | <MultExp>
+
+<MultExp> ::= <MultExp> '*' <Factor>
+           | <MultExp> '/' <Factor>
+           | <Factor>
+
+<Factor> ::= Number
+          | Identifier
+          | StringLiteral
+          | '(' <Expression> ')'
+
